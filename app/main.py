@@ -10,6 +10,7 @@ import re
 from json_db_lite import JSONDatabase
 
 from app.students.router import router as router_students
+from app.majors.router import router as router_majors
 
 # инициализация объекта
 small_db = JSONDatabase(file_path='students.json')
@@ -88,6 +89,7 @@ def home_page():
     return {"message": "Привет, Хабр!"}
 
 app.include_router(router_students)
+app.include_router(router_majors)
 
 # @app.get("/student", response_model=SStudent)
 # def get_student_from_param_id(student_id: int):

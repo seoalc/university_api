@@ -43,19 +43,3 @@ class Student(Base):
             "special_notes": self.special_notes,
             "major_id": self.major_id
         }
-
-
-# создаем модель таблицы факультетов (majors)
-class Major(Base):
-    id: Mapped[int_pk]
-    major_name: Mapped[str_uniq] = mapped_column(String(length=255))
-    major_description: Mapped[str_null_true] = mapped_column(String(length=255))
-    count_students: Mapped[int] = mapped_column(server_default=text('0'))
-
-    students: Mapped[List["Student"]] = relationship("Student", back_populates="major")
-
-    def __str__(self):
-        return f"{self.__class__.__name__}(id={self.id}, major_name={self.major_name!r})"
-
-    def __repr__(self):
-        return str(self)
