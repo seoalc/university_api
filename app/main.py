@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.staticfiles import StaticFiles
 from utils import json_to_dict_list
 import os
 from typing import Optional, Any
@@ -12,6 +13,7 @@ from json_db_lite import JSONDatabase
 from app.students.router import router as router_students
 from app.majors.router import router as router_majors
 from app.users.router import router as router_users
+from app.pages.router import router as router_pages
 
 # инициализация объекта
 small_db = JSONDatabase(file_path='students.json')
@@ -92,6 +94,9 @@ def home_page():
 app.include_router(router_users)
 app.include_router(router_students)
 app.include_router(router_majors)
+app.include_router(router_pages)
+
+app.mount('/static', StaticFiles(directory='app/static'), 'static')
 
 # @app.get("/student", response_model=SStudent)
 # def get_student_from_param_id(student_id: int):

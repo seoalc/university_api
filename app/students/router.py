@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 from app.students.dao import StudentDAO
 from app.students.rb import RBStudent
 from app.students.schemas import SStudent
 from app.students.schemas import SStudentAdd
+from app.students.models import Student
 
 
 router = APIRouter(prefix='/students', tags=['Работа со студентами'])
@@ -19,14 +21,17 @@ async def get_all_students(request_body: RBStudent = Depends()) -> list[SStudent
 
 @router.get("/{id}", summary="Получить одного студента по id")
 async def get_student_by_id(student_id: int) -> SStudent | None:
-    student = await StudentDAO.find_one_or_none_by_id(student_id)
+    student = await StudentDAO.find_one_or_none_by_id(
+        student_id,
+        options=[joinedload(Student.major)]  # Жадная загрузка
+    )
     if student is None:
         raise HTTPException(status_code=404, detail=f"Студент с ID {student_id} не найден!")
-    else:
-        return SStudent.model_validate({
-            **student.__dict__,
-            'major': student.major.major_name  # Преобразуйте объект Major в строку
-        })
+    
+    return SStudent.model_validate({
+        **student.__dict__,
+        'major': student.major.major_name
+    })
 
 @router.get("/by_filter", summary="Получить одного студента по фильтру")
 async def get_student_by_filter(request_body: RBStudent = Depends()) -> SStudent | None:
